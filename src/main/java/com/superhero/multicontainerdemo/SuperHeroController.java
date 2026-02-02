@@ -1,3 +1,5 @@
+package com.superhero.multicontainerdemo;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -7,8 +9,8 @@ import java.util.Map;
 public class SuperHeroController {
     private static final Map<String, String> SUPER_HEROES = new HashMap<>();
     static {
-        SUPER_HEROES.put("john", "IronMan");
-        SUPER_HEROES.put("jane", "WonderWoman");
+        SUPER_HEROES.put("tony", "IronMan");
+        SUPER_HEROES.put("diana", "WonderWoman");
         // add more as needed
     }
 
