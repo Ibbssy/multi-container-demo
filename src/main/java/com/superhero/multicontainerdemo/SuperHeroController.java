@@ -11,6 +11,7 @@ public class SuperHeroController {
     static {
         SUPER_HEROES.put("tony", "IronMan");
         SUPER_HEROES.put("diana", "WonderWoman");
+        SUPER_HEROES.put("mark", "Invincible");
         // add more as needed
     }
 
