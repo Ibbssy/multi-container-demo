@@ -14,9 +14,7 @@ res.send(`
     <head>
       <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-
     <body>
-
       <div class="container">
         <div>
           <h2>Hello Welcome to ComicsVerse User</h2>
@@ -51,9 +49,7 @@ res.send(`
     <head>
       <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-
     <body>
-
       <div class="container">
         <div>
           <h2>Hello Welcome to ComicsVerse ${superHeroName}</h2>

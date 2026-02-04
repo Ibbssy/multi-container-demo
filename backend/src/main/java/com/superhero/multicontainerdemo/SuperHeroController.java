@@ -16,7 +16,7 @@ public class SuperHeroController {
         SUPER_HEROES.put("miles", "Spider-Man");
         SUPER_HEROES.put("bruce", "BatMan");
         SUPER_HEROES.put("clark", "SuperMan");
-        SUPER_HEROES.put("robert" "Mecha Man")
+        SUPER_HEROES.put("robert", "Mecha Man");
         // add more as needed
     }
 

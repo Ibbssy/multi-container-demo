@@ -5,9 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/frontend/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,7 +124,7 @@
       <workItem from="1770007894208" duration="16000" />
       <workItem from="1770007929114" duration="3106000" />
       <workItem from="1770077864416" duration="724000" />
-      <workItem from="1770172058789" duration="4641000" />
+      <workItem from="1770172058789" duration="5701000" />
     </task>
     <servers />
   </component>

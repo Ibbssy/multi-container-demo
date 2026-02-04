@@ -45,6 +45,7 @@ input[type="text"] {
     font-size: 1rem;
     outline: none;
     transition: border 0.2s;
+    margin-bottom: 1rem;
 }
 
 input[type="text"]:focus {
@@ -54,7 +55,7 @@ input[type="text"]:focus {
 button {
     background: linear-gradient(90deg, #3842d8 60%, #a6bdfa 100%);
     color: white;
-    border: 1.5px;
+    border: none;
     border-radius: 6px;
     padding: 0.7rem 1rem;
     font-size: 1.05rem;
