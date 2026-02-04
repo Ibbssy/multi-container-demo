@@ -1,9 +1,8 @@
-version: '1.0'
-
 services:
   backend:
     build:
       context: ./backend
+    image: mcd-backend:1.0
     ports:
       - "8080:8080"
     networks:
@@ -12,6 +11,7 @@ services:
   frontend:
     build:
       context: ./frontend
+    image: mcd-frontend:1.0
     ports:
       - "6160:6160"
     environment:
