@@ -12,6 +12,7 @@ public class SuperHeroController {
         SUPER_HEROES.put("tony", "IronMan");
         SUPER_HEROES.put("diana", "WonderWoman");
         SUPER_HEROES.put("mark", "Invincible");
+        SUPER_HEROES.put("sonic", "SONIC");
         SUPER_HEROES.put("peter", "Spider-Man");
         SUPER_HEROES.put("miles", "Spider-Man");
         SUPER_HEROES.put("bruce", "BatMan");
