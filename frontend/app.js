@@ -4,16 +4,33 @@ const app = express();
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://backend:8080'; // Docker Compose service name
 
+app.use(express.static(__dirname));
 app.use(express.urlencoded({extended:true})); // For form POST parsing
 
 app.get('/', (req, res) => {
-    res.send(`
-    <form method="POST" action="/">
-      <label for="username">Enter username:</label>
-      <input type="text" name="username"/>
-      <button type="submit">Submit</button>
-    </form>
-    <h2>Hello Welcome to NOT Disneyland User</h2>`);
+    
+res.send(`
+    <html>
+    <head>
+      <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+
+    <body>
+
+      <div class="container">
+        <div>
+          <h2>Hello Welcome to ComicsVerse User</h2>
+        </div>
+        <div class="form-container">
+          <form method="POST" action="/">
+            <label for="username">Enter username:</label>
+            <input type="text" name="username"/>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+    </body>
+    </html>`);
 });
 
 app.post('/', async (req, res) => {
@@ -28,13 +45,29 @@ app.post('/', async (req, res) => {
         console.error(error);
         // fallback to 'User'
     }
-    res.send(`
-    <form method="POST" action="/">
-      <label for="username">Enter username:</label>
-      <input type="text" name="username"/>
-      <button type="submit">Submit</button>
-    </form>
-    <h2>Hello Welcome to ComicsVerse ${superHeroName}</h2>`);
+    
+res.send(`
+    <html>
+    <head>
+      <link rel="stylesheet" type="text/css" href="style.css">
+    </head>
+
+    <body>
+
+      <div class="container">
+        <div>
+          <h2>Hello Welcome to ComicsVerse ${superHeroName}</h2>
+        </div>
+        <div class="form-container">
+          <form method="POST" action="/">
+            <label for="username">Enter username:</label>
+            <input type="text" name="username"/>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+    </body>
+    </html>`);
 });
 
 const port = 6160;
