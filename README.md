@@ -47,4 +47,4 @@ Seamless communication between a Spring Boot backend and a Node.js/Express front
 | View backend logs          | ```docker-compose logs backend``` |
 | View backend logs          | ```docker-compose logs backend``` |
 
-# 🫡 Ready? Happy Dispatching!
+# 🫡 Ready? Happy Dispatching! 🧑‍💻
