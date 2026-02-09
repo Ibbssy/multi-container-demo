@@ -13,7 +13,7 @@ Your toolkit? A cutting-edge, multi-container application – just waiting for y
 
 **Step 1: Clone the SDN Super Project Repository**
 ```bash
-git clone <your-repo-url>
+git clone <this-repo-url>
 cd <repo-directory>
 ```
 
