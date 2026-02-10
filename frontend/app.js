@@ -33,14 +33,17 @@ res.send(`
 
 app.post('/', async (req, res) => {
     const username = req.body.username || '';
+    console.log(`Received POST request with username: ${username}`);
     let superHeroName = 'User';
     try {
+        console.log(`Calling backend API for username: ${username}`);
         const result = await axios.get(`${BACKEND_URL}/superhero`, {
             params: { username }
         });
         superHeroName = result.data.superHeroName || 'User';
+        console.log(`Received super hero name: ${superHeroName} for username: ${username}`);
     } catch (error) {
-        console.error(error);
+        console.error(`Error calling backend for username ${username}:`, error.message);
         // fallback to 'User'
     }
     
@@ -68,5 +71,5 @@ res.send(`
 
 const port = 6160;
 app.listen(port, () => {
-    console.log(`Frontend running on port ${port}`);
+    console.log(`Frontend server started on port ${port}`);
 });
