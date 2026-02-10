@@ -7,7 +7,6 @@
     <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,6 +128,7 @@
       <workItem from="1770172058789" duration="5701000" />
       <workItem from="1770695964870" duration="263000" />
       <workItem from="1770696297172" duration="1031000" />
+      <workItem from="1770763708499" duration="449000" />
     </task>
     <servers />
   </component>
