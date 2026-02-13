@@ -3,9 +3,22 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f5f6fa;
-    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #ffe4c4;
+    font-family: 'Verdana', 'Geneva', sans-serif;
     margin: 0;
+}
+
+.logo-wrapper {
+    position: absolute;
+    top: 2rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.logo {
+    width: 200px;
+    height: auto;
 }
 
 .container {
@@ -18,7 +31,7 @@ body {
 }
 
 h2 {
-    color: #3842d8;
+    color: #f28b1d;
     margin-top: 1.5rem;
     letter-spacing: 1px;
 }
@@ -49,11 +62,11 @@ input[type="text"] {
 }
 
 input[type="text"]:focus {
-    border-color: #3842d8;
+    border-color: #f28b1d;
 }
 
 button {
-    background: linear-gradient(90deg, #3842d8 60%, #a6bdfa 100%);
+    background: linear-gradient(90deg, #f28b1d 60%, #f7c997 100%);
     color: white;
     border: none;
     border-radius: 6px;
@@ -66,5 +79,5 @@ button {
 }
 
 button:hover {
-    background: linear-gradient(90deg, #2b3486 70%, #7b8cbe 100%);
+    background: linear-gradient(90deg, #b05c00 70%, #c29c4f 100%);
 }

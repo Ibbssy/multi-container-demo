@@ -15,9 +15,12 @@ res.send(`
       <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+      <div class="logo-wrapper">
+        <img src="assets/sdn_logo.png" alt="SDN logo" class="logo" />
+      </div>
       <div class="container">
         <div>
-          <h2>Hello Welcome to ComicsVerse User</h2>
+          <h2>Hello Welcome to Superhero Dispatch Network User</h2>
         </div>
         <div class="form-container">
           <form method="POST" action="/">
@@ -53,9 +56,12 @@ res.send(`
       <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+      <div class="logo-wrapper">
+        <img src="assets/sdn_logo.png" alt="SDN logo" class="logo" />
+      </div>
       <div class="container">
         <div>
-          <h2>Hello Welcome to ComicsVerse ${superHeroName}</h2>
+          <h2>Hello Welcome to Superhero Dispatch Network ${superHeroName}</h2>
         </div>
         <div class="form-container">
           <form method="POST" action="/">
