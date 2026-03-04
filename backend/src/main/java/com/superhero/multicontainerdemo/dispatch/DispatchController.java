@@ -28,7 +28,7 @@ public class DispatchController {
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, Object> createDispatch(@Valid @RequestBody CreateDispatchRequest request) {
         logger.atInfo()
-                .addKeyValue("heroCode", request.productCode())
+                .addKeyValue("heroCode", request.heroCode())
                 .addKeyValue("quantity", request.quantity())
                 .log("Create dispatch request received");
         return dispatchService.createDispatch(request);

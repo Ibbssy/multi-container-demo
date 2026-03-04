@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/CreateDispatchRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/CreateDispatchRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/DispatchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/DispatchController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/DispatchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/dispatch/DispatchService.java" afterDir="false" />
-    </list>
+    <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -134,7 +128,7 @@
       <workItem from="1770763708499" duration="449000" />
       <workItem from="1770946735861" duration="3160000" />
       <workItem from="1772511288271" duration="11693000" />
-      <workItem from="1772595131186" duration="9550000" />
+      <workItem from="1772595131186" duration="9891000" />
     </task>
     <servers />
   </component>
