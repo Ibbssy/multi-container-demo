@@ -87,8 +87,9 @@ To generate telemetry, hit the dispatch endpoint a few times:
 ```bash
 curl -X POST http://localhost:8080/dispatches \
   -H "Content-Type: application/json" \
-  -d '{"productCode":"ARC-REACTOR","quantity":1}'
+  -d '{"heroCode":"SHELLHEAD","quantity":1}'
 ```
+> Alternative heroCodes: `AMAZON`, `BLUE-BLUR`, `DARK-KNIGHT`, `WEB-HEAD`, `LAST-SON`, `MECHA-BLUE`, etc.
 
 Then:
 - Check **Prometheus** for `dispatches_created_total`

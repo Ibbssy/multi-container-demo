@@ -60,13 +60,13 @@ public class DispatchService {
             sendAuditAcknowledgement(dispatchId);
             logger.atInfo()
                     .addKeyValue("dispatchId", dispatchId)
-                    .addKeyValue("productCode", request.productCode())
+                    .addKeyValue("heroCode", request.productCode())
                     .addKeyValue("quantity", request.quantity())
                     .log("Dispatch created");
             return Map.of(
                     "dispatchId", dispatchId,
                     "status", "CREATED",
-                    "productCode", request.productCode(),
+                    "heroCode", request.productCode(),
                     "quantity", request.quantity()
             );
         } catch (RuntimeException exception) {
