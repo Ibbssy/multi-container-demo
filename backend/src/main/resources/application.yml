@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: multi-container-demo
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    tracing:
+      endpoint: http://localhost:4317
+
+logging:
+  structured:
+    format:
+      console: logstash
+  level:
+    root: INFO
+
+app:
+  audit:
+    base-url: http://localhost:${server.port:8080}

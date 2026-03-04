@@ -29,9 +29,9 @@ public class SuperHeroController {
 
     @GetMapping("/superhero")
     public Map<String, String> getSuperHero(@RequestParam String username) {
-        logger.info("Received request for username: {}", username);
+        logger.info("Received superhero lookup request");
         String hero = SUPER_HEROES.getOrDefault(username.toLowerCase(), "User");
-        logger.info("Assigning super hero '{}' to user '{}'", hero, username);
+        logger.info("Assigned superhero for request");
         Map<String, String> response = new HashMap<>();
         response.put("superHeroName", hero);
         return response;
