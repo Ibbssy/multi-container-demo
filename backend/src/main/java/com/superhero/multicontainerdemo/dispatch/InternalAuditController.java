@@ -15,7 +15,9 @@ public class InternalAuditController {
 
     @GetMapping("/internal/audit-ack")
     public Map<String, String> acknowledge(@RequestParam String dispatchId) {
-        logger.info("Audit acknowledgement request received");
+        logger.atInfo()
+                .addKeyValue("dispatchId", dispatchId)
+                .log("Audit acknowledgement request received");
         return Map.of("dispatchId", dispatchId, "status", "ACKNOWLEDGED");
     }
 }

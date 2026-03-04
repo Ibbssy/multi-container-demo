@@ -37,6 +37,64 @@ When SDN is running, agents (users) enter their name on the homepage.
 If registered, our intelligence systems instantly greet their superhero identity (e.g., “Mecha Man 🦾”).
 Seamless communication between a Spring Boot backend and a Node.js/Express frontend powers your SDN Command Center, all within isolated Docker containers.
 
+## 🔭 Observability Stack (Logs + Metrics + Traces)
+
+This project now includes a full observability pipeline for the Spring Boot backend:
+
+- **Metrics:** Spring Actuator + Prometheus
+- **Traces:** Micrometer Tracing (OpenTelemetry) → OTel Collector → Jaeger
+- **Logs:** Structured JSON logs from Spring Boot → Promtail → Loki (query in Grafana)
+
+### 1) Metrics flow
+
+1. Backend exposes metrics at `http://backend:9001/actuator/prometheus` (prod profile).
+2. Prometheus scrapes that endpoint using `observability/prometheus.yml`.
+3. Grafana reads metrics from Prometheus datasource.
+
+### 2) Trace flow
+
+1. Spring Boot creates spans for incoming requests and downstream calls (sampling set to `1.0`).
+2. Backend exports traces over OTLP HTTP to `otel-collector:4318/v1/traces`.
+3. OTel Collector receives traces and exports them to Jaeger.
+4. Jaeger UI lets you inspect full request traces.
+
+### 3) Log flow + correlation
+
+1. Backend logs are emitted as **structured JSON** (`logging.structured.format.console=logstash`).
+2. App logs include business fields (e.g., `dispatchId`, `productCode`, `quantity`) via structured key-value logging.
+3. Micrometer tracing injects `traceId`/`spanId` into log context, so logs correlate with traces.
+4. Promtail discovers Docker containers and ships logs to Loki.
+5. Grafana queries Loki logs; datasource derived field can jump from log `traceId` to Jaeger trace.
+
+## 🧭 Observability Endpoints
+
+- App UI: http://localhost:6160
+- Backend API: http://localhost:8080
+- Backend actuator/prometheus: http://localhost:9001/actuator/prometheus
+- Prometheus UI: http://localhost:9090
+- Jaeger UI: http://localhost:16686
+- Grafana UI: http://localhost:3000 (admin/admin)
+- Loki API: http://localhost:3100
+
+## ▶️ Run with observability
+
+```bash
+docker compose up --build
+```
+
+To generate telemetry, hit the dispatch endpoint a few times:
+
+```bash
+curl -X POST http://localhost:8080/dispatches \
+  -H "Content-Type: application/json" \
+  -d '{"productCode":"ARC-REACTOR","quantity":1}'
+```
+
+Then:
+- Check **Prometheus** for `dispatches_created_total`
+- Check **Jaeger** for `/dispatches` traces
+- Check **Grafana → Loki** for JSON logs containing `dispatchId` and `traceId`
+
 ## 💬 Useful SDN Commands
 
 | ACTION                     | COMMAND                           |

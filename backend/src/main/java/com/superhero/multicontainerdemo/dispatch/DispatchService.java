@@ -58,7 +58,11 @@ public class DispatchService {
             String dispatchId = UUID.randomUUID().toString();
             dispatchesCreatedCounter.increment();
             sendAuditAcknowledgement(dispatchId);
-            logger.info("Dispatch created");
+            logger.atInfo()
+                    .addKeyValue("dispatchId", dispatchId)
+                    .addKeyValue("productCode", request.productCode())
+                    .addKeyValue("quantity", request.quantity())
+                    .log("Dispatch created");
             return Map.of(
                     "dispatchId", dispatchId,
                     "status", "CREATED",
@@ -81,9 +85,14 @@ public class DispatchService {
                 .toUri();
         try {
             restTemplate.getForObject(auditUri, Map.class);
-            logger.info("Audit acknowledgement sent");
+            logger.atInfo()
+                    .addKeyValue("dispatchId", dispatchId)
+                    .log("Audit acknowledgement sent");
         } catch (RestClientException exception) {
-            logger.warn("Audit acknowledgement failed");
+            logger.atWarn()
+                    .setCause(exception)
+                    .addKeyValue("dispatchId", dispatchId)
+                    .log("Audit acknowledgement failed");
         }
     }
 }
