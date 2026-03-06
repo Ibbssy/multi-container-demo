@@ -9,16 +9,32 @@ body {
 }
 
 .logo-wrapper {
-    position: absolute;
-    top: 2rem;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
     display: flex;
-    justify-content: center;
-    width: 100%;
+    z-index: 10;
 }
 
 .logo {
-    width: 200px;
+    width: 150px;
     height: auto;
+}
+
+.logo-link {
+    display: inline-flex;
+    border-radius: 10px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.logo-link:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.16);
+}
+
+.logo-link:focus-visible {
+    outline: 3px solid #f28b1d;
+    outline-offset: 3px;
 }
 
 .container {
@@ -27,7 +43,8 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(32, 35, 42, 0.1), 0 1.5px 3px rgba(0, 0, 0, 0.02);
     text-align: center;
-    width: 340px;
+    width: 420px;
+    max-width: calc(100vw - 2rem);
 }
 
 h2 {
@@ -42,6 +59,7 @@ h2 {
     flex-direction: column;
     gap: 1rem;
     align-items: stretch;
+    margin-bottom: 1rem;
 }
 
 label {
@@ -80,4 +98,78 @@ button {
 
 button:hover {
     background: linear-gradient(90deg, #b05c00 70%, #c29c4f 100%);
+}
+
+.dispatch-panel {
+    margin-top: 1rem;
+    text-align: left;
+    border: 1px solid #ffd9ad;
+    background: #fff8ef;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.dispatch-panel h3 {
+    margin: 0 0 0.4rem;
+    color: #b05c00;
+}
+
+.dispatch-subtitle {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #5f5f5f;
+    font-size: 0.95rem;
+}
+
+.dispatch-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.dispatch-form input[type="number"] {
+    padding: 0.7rem;
+    border: 1.5px solid #cacdd6;
+    border-radius: 6px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    margin-bottom: 1rem;
+}
+
+.dispatch-form input[type="number"]:focus {
+    border-color: #f28b1d;
+}
+
+.status {
+    margin-top: 0.75rem;
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.95rem;
+}
+
+.status.success {
+    color: #0b5d2e;
+    background: #daf3e5;
+    border: 1px solid #9fd7b8;
+}
+
+.status.error {
+    color: #8b1e2a;
+    background: #fce2e7;
+    border: 1px solid #f3b8c1;
+}
+
+.dispatch-result {
+    margin-top: 1rem;
+    text-align: left;
+    background: #f6f8fb;
+    border: 1px solid #dde4f0;
+    border-radius: 10px;
+    padding: 0.8rem;
+}
+
+.dispatch-result p {
+    margin: 0.4rem 0;
+    color: #3b4456;
+    font-size: 0.92rem;
 }
