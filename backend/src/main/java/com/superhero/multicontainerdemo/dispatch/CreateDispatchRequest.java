@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record CreateDispatchRequest(
         @NotBlank String heroCode,
-        @Min(1) int quantity
+        @Min(1) int severity
 ) {
 }

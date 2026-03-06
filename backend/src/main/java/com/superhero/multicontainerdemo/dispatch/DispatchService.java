@@ -61,13 +61,13 @@ public class DispatchService {
             logger.atInfo()
                     .addKeyValue("dispatchId", dispatchId)
                     .addKeyValue("heroCode", request.heroCode())
-                    .addKeyValue("quantity", request.quantity())
+                    .addKeyValue("severity", request.severity())
                     .log("Dispatch created");
             return Map.of(
                     "dispatchId", dispatchId,
                     "status", "CREATED",
                     "heroCode", request.heroCode(),
-                    "quantity", request.quantity()
+                    "severity", request.severity()
             );
         } catch (RuntimeException exception) {
             status = "error";

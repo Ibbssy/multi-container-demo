@@ -29,7 +29,7 @@ public class DispatchController {
     public Map<String, Object> createDispatch(@Valid @RequestBody CreateDispatchRequest request) {
         logger.atInfo()
                 .addKeyValue("heroCode", request.heroCode())
-                .addKeyValue("quantity", request.quantity())
+                .addKeyValue("severity", request.severity())
                 .log("Create dispatch request received");
         return dispatchService.createDispatch(request);
     }

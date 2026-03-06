@@ -61,7 +61,7 @@ This project now includes a full observability pipeline for the Spring Boot back
 ### 3) Log flow + correlation
 
 1. Backend logs are emitted as **structured JSON** (`logging.structured.format.console=logstash`).
-2. App logs include business fields (e.g., `dispatchId`, `heroCode`, `quantity`) via structured key-value logging.
+2. App logs include business fields (e.g., `dispatchId`, `heroCode`, `severity`) via structured key-value logging.
 3. Micrometer tracing injects `traceId`/`spanId` into log context, so logs correlate with traces.
 4. Promtail discovers Docker containers and ships logs to Loki.
 5. Grafana queries Loki logs; datasource derived field can jump from log `traceId` to Jaeger trace.
@@ -87,7 +87,7 @@ To generate telemetry, hit the dispatch endpoint a few times:
 ```bash
 curl -X POST http://localhost:8080/dispatches \
   -H "Content-Type: application/json" \
-  -d '{"heroCode":"SHELLHEAD","quantity":1}'
+  -d '{"heroCode":"SHELLHEAD","severity":1}'
 ```
 > Alternative heroCodes: `AMAZON`, `BLUE-BLUR`, `DARK-KNIGHT`, `WEB-HEAD`, `LAST-SON`, `MECHA-BLUE`, etc.
 
