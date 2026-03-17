@@ -6,13 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/SuperHeroController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application-prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application-prod.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfile.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfileRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/superhero/multicontainerdemo/HeroPersistenceIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/superhero/multicontainerdemo/HeroPersistenceIntegrationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +76,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -140,7 +143,9 @@
       <workItem from="1772595131186" duration="9891000" />
       <workItem from="1772754262489" duration="4651000" />
       <workItem from="1773376474506" duration="2079000" />
-      <workItem from="1773637668935" duration="5412000" />
+      <workItem from="1773637668935" duration="8365000" />
+      <workItem from="1773714299979" duration="2168000" />
+      <workItem from="1773790291039" duration="1386000" />
     </task>
     <servers />
   </component>

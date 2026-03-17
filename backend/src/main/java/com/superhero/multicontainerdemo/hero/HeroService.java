@@ -42,8 +42,17 @@ public class HeroService {
     }
 
     @Transactional(readOnly = true)
-    public List<HeroResponse> findAllHeroes() {
-        return heroProfileRepository.findAllByOrderByUsernameAsc().stream()
+    public List<HeroResponse> findAllHeroes(String searchTerm) {
+        List<HeroProfile> heroProfiles = (searchTerm == null || searchTerm.isBlank())
+                ? heroProfileRepository.findAllByOrderByUsernameAsc()
+                : heroProfileRepository
+                        .findByUsernameContainingIgnoreCaseOrSuperHeroNameContainingIgnoreCaseOrHeroCodeContainingIgnoreCaseOrderByUsernameAsc(
+                                searchTerm.trim(),
+                                searchTerm.trim(),
+                                searchTerm.trim()
+                        );
+
+        return heroProfiles.stream()
                 .map(HeroResponse::from)
                 .toList();
     }
@@ -70,7 +79,7 @@ public class HeroService {
         Optional<HeroProfile> existingProfile = heroProfileRepository.findByUsernameIgnoreCase(username);
         if (existingProfile.isPresent()) {
             HeroProfile heroProfile = existingProfile.get();
-            heroProfile.updateHeroDetails(superHeroName, heroCode);
+            heroProfile.updateProfile(username, superHeroName, heroCode);
             heroProfileRepository.save(heroProfile);
             return;
         }
@@ -78,11 +87,53 @@ public class HeroService {
         heroProfileRepository.save(new HeroProfile(username, superHeroName, heroCode));
     }
 
+    @Transactional
+    public HeroResponse updateHero(String existingUsername, CreateHeroRequest request) {
+        String normalizedExistingUsername = normalizeUsername(existingUsername);
+        String normalizedRequestedUsername = normalizeUsername(request.username());
+
+        HeroProfile heroProfile = heroProfileRepository.findByUsernameIgnoreCase(normalizedExistingUsername)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Hero not found for username: " + normalizedExistingUsername
+                ));
+
+        if (!heroProfile.getUsername().equalsIgnoreCase(normalizedRequestedUsername)
+                && heroProfileRepository.existsByUsernameIgnoreCase(normalizedRequestedUsername)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Hero already exists for username: " + normalizedRequestedUsername
+            );
+        }
+
+        heroProfile.updateProfile(
+                normalizedRequestedUsername,
+                request.superHeroName(),
+                request.heroCode()
+        );
+        return HeroResponse.from(heroProfileRepository.save(heroProfile));
+    }
+
+    @Transactional
+    public void deleteHero(String username) {
+        String normalizedUsername = normalizeUsername(username);
+        HeroProfile heroProfile = heroProfileRepository.findByUsernameIgnoreCase(normalizedUsername)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Hero not found for username: " + normalizedUsername
+                ));
+        heroProfileRepository.delete(heroProfile);
+    }
+
     private Optional<HeroProfile> findHeroByUsername(String username) {
         if (username == null || username.isBlank()) {
             return Optional.empty();
         }
 
-        return heroProfileRepository.findByUsernameIgnoreCase(username.trim());
+        return heroProfileRepository.findByUsernameIgnoreCase(normalizeUsername(username));
+    }
+
+    private String normalizeUsername(String username) {
+        return username == null ? "" : username.trim().toLowerCase();
     }
 }

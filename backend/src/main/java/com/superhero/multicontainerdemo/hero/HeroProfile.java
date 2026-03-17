@@ -49,7 +49,8 @@ public class HeroProfile {
         return heroCode;
     }
 
-    public void updateHeroDetails(String superHeroName, String heroCode) {
+    public void updateProfile(String username, String superHeroName, String heroCode) {
+        this.username = normalizeUsername(username);
         this.superHeroName = superHeroName.trim();
         this.heroCode = normalizeHeroCode(heroCode);
     }

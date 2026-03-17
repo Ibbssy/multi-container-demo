@@ -12,4 +12,10 @@ public interface HeroProfileRepository extends JpaRepository<HeroProfile, Long> 
     boolean existsByUsernameIgnoreCase(String username);
 
     List<HeroProfile> findAllByOrderByUsernameAsc();
+
+    List<HeroProfile> findByUsernameContainingIgnoreCaseOrSuperHeroNameContainingIgnoreCaseOrHeroCodeContainingIgnoreCaseOrderByUsernameAsc(
+            String username,
+            String superHeroName,
+            String heroCode
+    );
 }

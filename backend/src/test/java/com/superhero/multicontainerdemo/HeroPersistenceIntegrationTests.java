@@ -11,6 +11,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,5 +50,36 @@ class HeroPersistenceIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.superHeroName").value("Black Widow"))
                 .andExpect(jsonPath("$.heroCode").value("WIDOW"));
+    }
+
+    @Test
+    void shouldUpdateSearchAndDeleteHero() throws Exception {
+        CreateHeroRequest createRequest = new CreateHeroRequest("arthur", "Aquaman", "TIDE");
+        CreateHeroRequest updateRequest = new CreateHeroRequest("arthur.curry", "Aquaman Prime", "OCEAN");
+
+        mockMvc.perform(post("/heroes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRequest)))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(put("/heroes/arthur")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("arthur.curry"))
+                .andExpect(jsonPath("$.superHeroName").value("Aquaman Prime"))
+                .andExpect(jsonPath("$.heroCode").value("OCEAN"));
+
+        mockMvc.perform(get("/heroes").param("search", "ocean"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].username").value("arthur.curry"));
+
+        mockMvc.perform(delete("/heroes/arthur.curry"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/superhero").param("username", "arthur.curry"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.superHeroName").value("User"))
+                .andExpect(jsonPath("$.heroCode").value(""));
     }
 }
