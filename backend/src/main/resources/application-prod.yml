@@ -1,3 +1,10 @@
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://postgres:5432/superheroes}
+    username: ${SPRING_DATASOURCE_USERNAME:superhero}
+    password: ${SPRING_DATASOURCE_PASSWORD:superhero}
+    driver-class-name: org.postgresql.Driver
+
 management:
   server:
     port: 9001

@@ -1,4 +1,22 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=superheroes
+      - POSTGRES_USER=superhero
+      - POSTGRES_PASSWORD=superhero
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U superhero -d superheroes"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - appnet
+
   backend:
     build:
       context: ./backend
@@ -8,9 +26,15 @@ services:
       - "9001:9001"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/superheroes
+      - SPRING_DATASOURCE_USERNAME=superhero
+      - SPRING_DATASOURCE_PASSWORD=superhero
       - MANAGEMENT_OTLP_TRACING_ENDPOINT=http://otel-collector:4318/v1/traces
     depends_on:
-      - otel-collector
+      postgres:
+        condition: service_healthy
+      otel-collector:
+        condition: service_started
     networks:
       - appnet
 
@@ -103,3 +127,6 @@ services:
 
 networks:
   appnet:
+
+volumes:
+  postgres-data:

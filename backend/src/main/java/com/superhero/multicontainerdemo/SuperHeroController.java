@@ -1,39 +1,35 @@
 package com.superhero.multicontainerdemo;
 
+import com.superhero.multicontainerdemo.hero.HeroLookupResponse;
+import com.superhero.multicontainerdemo.hero.HeroService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SuperHeroController {
 
     private static final Logger logger = LoggerFactory.getLogger(SuperHeroController.class);
 
-    private static final Map<String, String> SUPER_HEROES = new HashMap<>();
-    static {
-        SUPER_HEROES.put("tony", "IronMan");
-        SUPER_HEROES.put("diana", "WonderWoman");
-        SUPER_HEROES.put("mark", "Invincible");
-        SUPER_HEROES.put("sonic", "SONIC");
-        SUPER_HEROES.put("peter", "Spider-Man");
-        SUPER_HEROES.put("miles", "Spider-Man");
-        SUPER_HEROES.put("bruce", "BatMan");
-        SUPER_HEROES.put("clark", "SuperMan");
-        SUPER_HEROES.put("robert", "Mecha Man");
-        SUPER_HEROES.put("steve", "Captain America");
-        // add more as needed
+    private final HeroService heroService;
+
+    public SuperHeroController(HeroService heroService) {
+        this.heroService = heroService;
     }
 
     @GetMapping("/superhero")
-    public Map<String, String> getSuperHero(@RequestParam String username) {
-        logger.info("Received superhero lookup request");
-        String hero = SUPER_HEROES.getOrDefault(username.toLowerCase(), "User");
-        logger.info("Assigned superhero for request");
-        Map<String, String> response = new HashMap<>();
-        response.put("superHeroName", hero);
-        return response;
+    public HeroLookupResponse getSuperHero(@RequestParam String username) {
+        logger.atInfo()
+                .addKeyValue("username", username)
+                .log("Received superhero lookup request");
+        HeroLookupResponse hero = heroService.findHeroLookup(username);
+        logger.atInfo()
+                .addKeyValue("username", username)
+                .addKeyValue("superHeroName", hero.superHeroName())
+                .addKeyValue("heroCode", hero.heroCode())
+                .log("Assigned superhero for request");
+        return hero;
     }
 }

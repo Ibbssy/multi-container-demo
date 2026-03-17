@@ -4,18 +4,6 @@ const app = express();
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://backend:8080'; // Docker Compose service name
 
-const HERO_DISPATCH_CODES = {
-    IronMan: 'SHELLHEAD',
-    WonderWoman: 'AMAZON',
-    Invincible: 'INVINCIBLE',
-    SONIC: 'BLUE-BLUR',
-    'Spider-Man': 'WEB-HEAD',
-    BatMan: 'DARK-KNIGHT',
-    SuperMan: 'LAST-SON',
-    'Mecha Man': 'MECHA-BLUE',
-    'Captain America': 'STAR-SPANGLED'
-};
-
 app.use(express.static(__dirname));
 app.use(express.urlencoded({extended:true})); // For form POST parsing
 
@@ -30,13 +18,14 @@ const escapeHtml = (value = '') => value
 
 const buildPage = ({
     superHeroName = 'User',
+    heroCode = '',
     username = '',
     statusMessage = '',
     statusType = 'success',
     dispatchPayload
 } = {}) => {
-    const dispatchHeroCode = HERO_DISPATCH_CODES[superHeroName] || '';
     const safeSuperHeroName = escapeHtml(superHeroName);
+    const safeHeroCode = escapeHtml(heroCode);
     const safeUsername = escapeHtml(username);
 
     const dispatchPanel = isRecognizedHero(superHeroName)
@@ -52,7 +41,7 @@ const buildPage = ({
             <input
               type="text"
               name="heroCode"
-              value="${escapeHtml(dispatchHeroCode)}"
+              value="${safeHeroCode}"
               required
             />
 
@@ -118,12 +107,14 @@ app.post('/', async (req, res) => {
     const username = req.body.username || '';
     console.log(`Received POST request with username: ${username}`);
     let superHeroName = 'User';
+    let heroCode = '';
     try {
         console.log(`Calling backend API for username: ${username}`);
         const result = await axios.get(`${BACKEND_URL}/superhero`, {
             params: { username }
         });
         superHeroName = result.data.superHeroName || 'User';
+        heroCode = result.data.heroCode || '';
         console.log(`Received super hero name: ${superHeroName} for username: ${username}`);
     } catch (error) {
         console.error(`Error calling backend for username ${username}:`, error.message);
@@ -132,6 +123,7 @@ app.post('/', async (req, res) => {
 
     res.send(buildPage({
         superHeroName,
+        heroCode,
         username,
         statusMessage: isRecognizedHero(superHeroName)
             ? 'Hero recognized. Dispatch menu unlocked.'
@@ -148,6 +140,7 @@ app.post('/dispatch', async (req, res) => {
     if (!isRecognizedHero(superHeroName)) {
         return res.send(buildPage({
             superHeroName,
+            heroCode,
             username,
             statusType: 'error',
             statusMessage: 'Dispatch denied. Please enter a recognized username first.'
@@ -157,6 +150,7 @@ app.post('/dispatch', async (req, res) => {
     if (!heroCode || Number.isNaN(severity) || severity < 1) {
         return res.send(buildPage({
             superHeroName,
+            heroCode,
             username,
             statusType: 'error',
             statusMessage: 'Please provide a valid hero code and severity (minimum 1).'
@@ -171,6 +165,7 @@ app.post('/dispatch', async (req, res) => {
 
         return res.send(buildPage({
             superHeroName,
+            heroCode,
             username,
             statusType: 'success',
             statusMessage: 'Dispatch created successfully.',
@@ -183,6 +178,7 @@ app.post('/dispatch', async (req, res) => {
 
         return res.send(buildPage({
             superHeroName,
+            heroCode,
             username,
             statusType: 'error',
             statusMessage: fallbackMessage

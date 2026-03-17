@@ -37,6 +37,30 @@ When SDN is running, agents (users) enter their name on the homepage.
 If registered, our intelligence systems instantly greet their superhero identity (e.g., “Mecha Man 🦾”).
 Seamless communication between a Spring Boot backend and a Node.js/Express frontend powers your SDN Command Center, all within isolated Docker containers.
 
+## 🗄️ Hero Database
+
+Hero identities are now stored in PostgreSQL instead of a hardcoded Java map.
+The backend keeps the existing `GET /superhero?username=...` lookup endpoint and also exposes:
+
+- `GET /heroes` to list all registered heroes
+- `POST /heroes` to add a new hero mapping
+
+Example:
+
+```bash
+curl -X POST http://localhost:8080/heroes \
+  -H "Content-Type: application/json" \
+  -d '{"username":"natasha","superHeroName":"Black Widow","heroCode":"WIDOW"}'
+```
+
+Then look it up:
+
+```bash
+curl "http://localhost:8080/superhero?username=natasha"
+```
+
+Each hero row now stores both the display name and dispatch code together, so the frontend no longer maintains a separate hardcoded hero-code mapping.
+
 ## 🔭 Observability Stack (Logs + Metrics + Traces)
 
 This project now includes a full observability pipeline for the Spring Boot backend:
@@ -70,6 +94,7 @@ This project now includes a full observability pipeline for the Spring Boot back
 
 - App UI: http://localhost:6160
 - Backend API: http://localhost:8080
+- PostgreSQL: localhost:5432 (`superhero` / `superhero`, db `superheroes`)
 - Backend actuator/prometheus: http://localhost:9001/actuator/prometheus
 - Prometheus UI: http://localhost:9090
 - Jaeger UI: http://localhost:16686
