@@ -46,23 +46,56 @@ const buildHeroRequest = (body) => ({
     heroCode: normalizeInput(body.heroCode)
 });
 
+const resolveDispatchHeroCodes = async () => {
+    const heroes = await fetchHeroes('');
+    return [...new Set(heroes
+        .map((hero) => normalizeInput(hero.heroCode))
+        .filter(Boolean))]
+        .sort((left, right) => left.localeCompare(right));
+};
+
+const normalizeStatusType = (value) => (value === 'error' ? 'error' : 'success');
+
 const formatBackendError = (error, fallbackMessage) => (
     error.response?.data?.message || fallbackMessage
+);
+
+const buildDatabaseRedirect = ({ username, search, edit, statusMessage, statusType, anchor }) => {
+    const path = buildPathWithQuery('/database', {
+        username,
+        search,
+        edit,
+        statusMessage,
+        statusType: normalizeStatusType(statusType)
+    });
+
+    return anchor ? `${path}#${anchor}` : path;
+};
+
+const buildHomeRedirect = ({ username, statusMessage, statusType }) => (
+    buildPathWithQuery('/', {
+        username,
+        statusMessage,
+        statusType: normalizeStatusType(statusType)
+    })
 );
 
 const registerRoutes = (app) => {
     app.get('/', async (req, res) => {
         const access = await getAccess(req.query.username);
-        const statusMessage = access.username
+        const requestStatusMessage = normalizeInput(req.query.statusMessage);
+        const statusMessage = requestStatusMessage || (access.username
             ? access.recognized
                 ? 'Hero recognized. Dispatch and database access unlocked.'
-                : 'Greeting delivered. Access remains locked for unrecognized usernames.'
-            : '';
+                : 'Unrecognised username. Access remains locked.'
+            : '');
 
         res.send(buildLoginPage({
             access,
             statusMessage,
-            statusType: access.username && !access.recognized ? 'error' : 'success'
+            statusType: requestStatusMessage
+                ? normalizeStatusType(req.query.statusType)
+                : access.username && !access.recognized ? 'error' : 'success'
         }));
     });
 
@@ -79,11 +112,41 @@ const registerRoutes = (app) => {
                 ? 'Dispatch denied. Please log in with a recognized hero username first.'
                 : 'Enter a valid hero username on the login page to unlock dispatch.';
 
-        res.send(buildDispatchPage({
-            access,
-            statusMessage,
-            statusType: 'error'
-        }));
+        if (!access.recognized) {
+            return res.send(buildDispatchPage({
+                access,
+                statusMessage,
+                statusType: 'error'
+            }));
+        }
+
+        try {
+            const heroCodes = await resolveDispatchHeroCodes();
+            const selectedHeroCode = heroCodes.includes(access.heroCode)
+                ? access.heroCode
+                : heroCodes[0] || '';
+
+            return res.send(buildDispatchPage({
+                access: {
+                    ...access,
+                    heroCode: selectedHeroCode
+                },
+                heroCodes,
+                selectedHeroCode,
+                statusMessage: heroCodes.length ? '' : 'No hero codes are currently available for dispatch.',
+                statusType: heroCodes.length ? 'success' : 'error'
+            }));
+        } catch (error) {
+            console.error('Error loading dispatch options:', error.message);
+
+            return res.send(buildDispatchPage({
+                access,
+                heroCodes: [],
+                selectedHeroCode: '',
+                statusMessage: 'Unable to load hero codes for dispatch right now.',
+                statusType: 'error'
+            }));
+        }
     });
 
     app.post('/dispatch', async (req, res) => {
@@ -99,12 +162,49 @@ const registerRoutes = (app) => {
             }));
         }
 
-        if (!heroCode || Number.isNaN(severity) || severity < 1 || severity > 5) {
+        let heroCodes = [];
+
+        try {
+            heroCodes = await resolveDispatchHeroCodes();
+        } catch (error) {
+            console.error('Error loading dispatch options:', error.message);
+
+            return res.send(buildDispatchPage({
+                access,
+                heroCodes: [],
+                selectedHeroCode: '',
+                statusMessage: 'Unable to load hero codes for dispatch right now.',
+                statusType: 'error'
+            }));
+        }
+
+        const selectedHeroCode = heroCodes.includes(heroCode)
+            ? heroCode
+            : heroCodes.includes(access.heroCode)
+                ? access.heroCode
+                : heroCodes[0] || '';
+
+        if (!heroCodes.length) {
             return res.send(buildDispatchPage({
                 access: {
                     ...access,
-                    heroCode: heroCode || access.heroCode
+                    heroCode: ''
                 },
+                heroCodes,
+                selectedHeroCode: '',
+                statusMessage: 'No hero codes are currently available for dispatch.',
+                statusType: 'error'
+            }));
+        }
+
+        if (!heroCode || !heroCodes.includes(heroCode) || Number.isNaN(severity) || severity < 1 || severity > 5) {
+            return res.send(buildDispatchPage({
+                access: {
+                    ...access,
+                    heroCode: selectedHeroCode
+                },
+                heroCodes,
+                selectedHeroCode,
                 statusMessage: 'Please provide a valid hero code and severity between 1 and 5.',
                 statusType: 'error'
             }));
@@ -121,6 +221,8 @@ const registerRoutes = (app) => {
                     ...access,
                     heroCode
                 },
+                heroCodes,
+                selectedHeroCode: heroCode,
                 statusMessage: 'Dispatch created successfully.',
                 statusType: 'success',
                 dispatchPayload
@@ -133,6 +235,8 @@ const registerRoutes = (app) => {
                     ...access,
                     heroCode
                 },
+                heroCodes,
+                selectedHeroCode: heroCode,
                 statusMessage: formatBackendError(error, 'Dispatch request failed.'),
                 statusType: 'error'
             }));
@@ -143,9 +247,15 @@ const registerRoutes = (app) => {
         const access = await getAccess(req.query.username);
         const search = normalizeInput(req.query.search);
         const editUsername = normalizeInput(req.query.edit);
+        const requestStatusMessage = normalizeInput(req.query.statusMessage);
 
         try {
             const { heroes, editingHero } = await resolveDatabaseState(access, search, editUsername);
+            const statusMessage = requestStatusMessage || (!access.recognized
+                ? (access.username
+                    ? 'Database access denied. Please use a recognised hero username.'
+                    : 'Enter a valid hero username on the login page to access the database.')
+                : '');
 
             return res.send(buildDatabasePage({
                 access,
@@ -153,12 +263,10 @@ const registerRoutes = (app) => {
                 search,
                 editingUsername: editUsername,
                 editingHero,
-                statusMessage: !access.recognized
-                    ? (access.username
-                        ? 'Database access denied. Please use a recognized hero username.'
-                        : 'Enter a valid hero username on the login page to access the database.')
-                    : '',
-                statusType: 'error'
+                statusMessage,
+                statusType: requestStatusMessage
+                    ? normalizeStatusType(req.query.statusType)
+                    : 'error'
             }));
         } catch (error) {
             console.error('Error loading database page:', error.message);
@@ -186,18 +294,15 @@ const registerRoutes = (app) => {
                 heroes: [],
                 search,
                 formValues: heroRequest,
-                statusMessage: 'Database access denied. Please enter a recognized username first.',
+                statusMessage: 'Database access denied. Please enter a recognised username first.',
                 statusType: 'error'
             }));
         }
 
         try {
             await createHero(heroRequest);
-            const { heroes } = await safeResolveDatabaseState(access, search, '');
-
-            return res.send(buildDatabasePage({
-                access,
-                heroes,
+            return res.redirect(buildDatabaseRedirect({
+                username: access.username,
                 search,
                 statusMessage: 'Hero created successfully.',
                 statusType: 'success'
@@ -231,22 +336,20 @@ const registerRoutes = (app) => {
                 editingUsername: existingUsername,
                 editingHero: null,
                 formValues: heroRequest,
-                statusMessage: 'Database access denied. Please enter a recognized username first.',
+                statusMessage: 'Database access denied. Please enter a recognised username first.',
                 statusType: 'error'
             }));
         }
 
         try {
             await updateHero(existingUsername, heroRequest);
-            const nextEditingUsername = heroRequest.username;
-            const { heroes, editingHero } = await safeResolveDatabaseState(access, search, nextEditingUsername);
+            const nextUsername = existingUsername === access.username
+                ? heroRequest.username
+                : access.username;
 
-            return res.send(buildDatabasePage({
-                access,
-                heroes,
+            return res.redirect(buildDatabaseRedirect({
+                username: nextUsername,
                 search,
-                editingUsername: nextEditingUsername,
-                editingHero,
                 statusMessage: 'Hero updated successfully.',
                 statusType: 'success'
             }));
@@ -277,18 +380,22 @@ const registerRoutes = (app) => {
                 access,
                 heroes: [],
                 search,
-                statusMessage: 'Database access denied. Please enter a recognized username first.',
+                statusMessage: 'Database access denied. Please enter a recognised username first.',
                 statusType: 'error'
             }));
         }
 
         try {
             await deleteHero(existingUsername);
-            const { heroes } = await safeResolveDatabaseState(access, search, '');
+            if (existingUsername === access.username) {
+                return res.redirect(buildHomeRedirect({
+                    statusMessage: 'Your hero profile was deleted. Please log in again.',
+                    statusType: 'success'
+                }));
+            }
 
-            return res.send(buildDatabasePage({
-                access,
-                heroes,
+            return res.redirect(buildDatabaseRedirect({
+                username: access.username,
                 search,
                 statusMessage: 'Hero deleted successfully.',
                 statusType: 'success'

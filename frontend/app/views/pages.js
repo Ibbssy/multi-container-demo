@@ -12,7 +12,7 @@ const buildLoginPage = ({ access, statusMessage, statusType = 'success' }) => {
         ? `
           <section class="panel access-panel">
             <h3>Mission Control Access</h3>
-            <p class="panel-subtitle">Your hero profile has been verified. Choose a destination to continue.</p>
+            <p class="panel-subtitle">Your hero profile has been verified. Access to SDN services granted.</p>
             <div class="card-link-grid">
               <a class="feature-card" href="${buildPathWithQuery('/dispatch', { username: access.username })}">
                 <strong>Dispatch</strong>
@@ -27,8 +27,8 @@ const buildLoginPage = ({ access, statusMessage, statusType = 'success' }) => {
         `
         : `
           <section class="panel access-panel locked-panel">
-            <h3>Greeting Only</h3>
-            <p class="panel-subtitle">Unknown usernames still receive the greeting, but dispatch and database tools remain unavailable.</p>
+            <h3>Unrecognised user</h3>
+            <p class="panel-subtitle">Access to SDN services are only available to SDN registered heroes.</p>
           </section>
         `;
 
@@ -46,7 +46,7 @@ const buildLoginPage = ({ access, statusMessage, statusType = 'success' }) => {
             <section class="panel login-panel">
               <div class="panel-heading">
                 <h2>Hero Login</h2>
-                <p class="panel-subtitle">Enter a hero username to unlock the dispatch console and database tools.</p>
+                <p class="panel-subtitle">Enter a registered hero username to access SDN services.</p>
               </div>
               <form method="POST" action="/login" class="stack-form">
                 <label for="username">Enter username:</label>
@@ -58,8 +58,8 @@ const buildLoginPage = ({ access, statusMessage, statusType = 'success' }) => {
             ${createGreetingCard({
                 access,
                 subtitle: access.recognized
-                    ? 'Validated heroes can continue into dispatch or database operations.'
-                    : 'A greeting is always available, but only validated heroes can continue.',
+                    ? 'Hero recognised. Access to SDN services granted.'
+                    : 'Unknown user, please redirect to SDN Subscription App.',
                 statusMessage: '',
                 statusType
             })}
@@ -69,7 +69,25 @@ const buildLoginPage = ({ access, statusMessage, statusType = 'success' }) => {
     });
 };
 
-const buildDispatchPage = ({ access, statusMessage, statusType = 'success', dispatchPayload }) => {
+const buildDispatchHeroCodeOptions = (heroCodes, selectedHeroCode) => {
+    if (!heroCodes.length) {
+        return '<option value="">No hero codes available</option>';
+    }
+
+    return heroCodes.map((heroCode) => {
+        const selectedAttribute = heroCode === selectedHeroCode ? ' selected' : '';
+        return `<option value="${escapeHtml(heroCode)}"${selectedAttribute}>${escapeHtml(heroCode)}</option>`;
+    }).join('');
+};
+
+const buildDispatchPage = ({
+    access,
+    heroCodes = [],
+    selectedHeroCode = '',
+    statusMessage,
+    statusType = 'success',
+    dispatchPayload
+}) => {
     const dispatchContent = access.recognized
         ? `
           <section class="panel dispatch-panel">
@@ -79,12 +97,14 @@ const buildDispatchPage = ({ access, statusMessage, statusType = 'success', disp
               <input type="hidden" name="username" value="${escapeHtml(access.username)}" />
 
               <label for="heroCode">Hero code:</label>
-              <input id="heroCode" type="text" name="heroCode" value="${escapeHtml(access.heroCode)}" required />
+              <select id="heroCode" name="heroCode" ${heroCodes.length ? '' : 'disabled'} required>
+                ${buildDispatchHeroCodeOptions(heroCodes, selectedHeroCode)}
+              </select>
 
               <label for="severity">Severity (1-5):</label>
               <input id="severity" type="number" name="severity" min="1" max="5" value="1" required />
 
-              <button type="submit">Submit Dispatch</button>
+              <button type="submit" ${heroCodes.length ? '' : 'disabled'}>Submit Dispatch</button>
             </form>
             ${createStatusMarkup(statusMessage, statusType)}
           </section>
@@ -134,9 +154,9 @@ const buildDatabaseRows = ({ heroes, username, search }) => {
 
     return heroes.map((hero) => `
         <tr>
-          <td>${escapeHtml(hero.username)}</td>
-          <td>${escapeHtml(hero.superHeroName)}</td>
-          <td>${escapeHtml(hero.heroCode)}</td>
+          <td><span class="hero-table-value">${escapeHtml(hero.username)}</span></td>
+          <td><span class="hero-table-value">${escapeHtml(hero.superHeroName)}</span></td>
+          <td><span class="hero-table-value">${escapeHtml(hero.heroCode)}</span></td>
           <td>
             <div class="table-actions">
               <a
@@ -145,7 +165,7 @@ const buildDatabaseRows = ({ heroes, username, search }) => {
                     username,
                     search,
                     edit: hero.username
-                })}"
+                })}#hero-form-panel"
               >
                 Edit
               </a>
@@ -204,7 +224,7 @@ const buildDatabasePage = ({
                   </div>
                 </form>
               </section>
-              <section class="panel">
+              <section class="panel hero-form-panel" id="hero-form-panel">
                 <div class="section-header">
                   <h3>${isEditing ? 'Edit Hero' : 'Add Hero'}</h3>
                   ${isEditing

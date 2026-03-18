@@ -44,21 +44,21 @@ const createNavMarkup = ({ username, recognized, activePage }) => {
 const createGreetingCard = ({ access, title, subtitle, statusMessage, statusType }) => `
     <section class="panel welcome-panel">
       <div class="panel-heading">
-        <h2>Hello Welcome to Superhero Dispatch Network ${escapeHtml(access.superHeroName)}</h2>
+        <h2 class="hero-heading">Welcome to Superhero Dispatch Network ${escapeHtml(access.superHeroName)}</h2>
         <p class="panel-subtitle">${escapeHtml(subtitle)}</p>
       </div>
       <div class="hero-summary-grid">
         <div class="hero-summary-item">
           <span class="summary-label">Username</span>
-          <strong>${escapeHtml(access.username || 'Not entered')}</strong>
+          <strong class="hero-summary-value">${escapeHtml(access.username || 'Not entered')}</strong>
         </div>
         <div class="hero-summary-item">
           <span class="summary-label">Hero identity</span>
-          <strong>${escapeHtml(access.superHeroName)}</strong>
+          <strong class="hero-summary-value">${escapeHtml(access.superHeroName)}</strong>
         </div>
         <div class="hero-summary-item">
           <span class="summary-label">Hero code</span>
-          <strong>${escapeHtml(access.heroCode || 'Unavailable')}</strong>
+          <strong class="hero-summary-value">${escapeHtml(access.heroCode || 'Unavailable')}</strong>
         </div>
       </div>
       ${title ? `<h3 class="section-title">${escapeHtml(title)}</h3>` : ''}
@@ -69,7 +69,7 @@ const createGreetingCard = ({ access, title, subtitle, statusMessage, statusType
 const createAccessDeniedMarkup = (username) => `
     <section class="panel access-panel locked-panel">
       <h3>Restricted Access</h3>
-      <p class="panel-subtitle">A valid hero username is required before dispatch and database controls are available.</p>
+      <p class="panel-subtitle">Dispatch and database controls are only available to authorised heroes.</p>
       <a class="button-link" href="${buildPathWithQuery('/', { username })}">Return to Login</a>
     </section>
 `;

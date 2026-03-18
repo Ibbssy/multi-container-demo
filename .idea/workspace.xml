@@ -6,14 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="287024a6-ec71-4f99-952e-d964c90962ad" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfile.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfile.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfileRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroProfileRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/superhero/multicontainerdemo/hero/HeroService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/java/com/superhero/multicontainerdemo/HeroPersistenceIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/com/superhero/multicontainerdemo/HeroPersistenceIntegrationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/views/layout.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/views/layout.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app/views/pages.js" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/app/views/pages.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/style.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -145,7 +140,7 @@
       <workItem from="1773376474506" duration="2079000" />
       <workItem from="1773637668935" duration="8365000" />
       <workItem from="1773714299979" duration="2168000" />
-      <workItem from="1773790291039" duration="1386000" />
+      <workItem from="1773790291039" duration="6548000" />
     </task>
     <servers />
   </component>
