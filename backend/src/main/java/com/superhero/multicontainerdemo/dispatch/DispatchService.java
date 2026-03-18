@@ -62,12 +62,16 @@ public class DispatchService {
                     .addKeyValue("dispatchId", dispatchId)
                     .addKeyValue("heroCode", request.heroCode())
                     .addKeyValue("severity", request.severity())
-                    .log("Dispatch created");
+                    .addKeyValue("latitude", request.latitude())
+                    .addKeyValue("longitude", request.longitude())
+                    .log("Dispatch created at location [{}, {}]", request.latitude(), request.longitude());
             return Map.of(
                     "dispatchId", dispatchId,
                     "status", "CREATED",
                     "heroCode", request.heroCode(),
-                    "severity", request.severity()
+                    "severity", request.severity(),
+                    "latitude", request.latitude(),
+                    "longitude", request.longitude()
             );
         } catch (RuntimeException exception) {
             status = "error";

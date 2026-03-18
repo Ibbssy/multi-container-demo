@@ -84,13 +84,32 @@ const buildDispatchPage = ({
     access,
     heroCodes = [],
     selectedHeroCode = '',
+    selectedLocation = null,
     statusMessage,
     statusType = 'success',
     dispatchPayload
 }) => {
-    const dispatchContent = access.recognized
+    const hasSelectedLocation = Boolean(
+        selectedLocation
+        && Number.isFinite(selectedLocation.latitude)
+        && Number.isFinite(selectedLocation.longitude)
+    );
+    const latestDispatchLocation = dispatchPayload
+        && dispatchPayload.latitude !== undefined
+        && dispatchPayload.longitude !== undefined
+        ? {
+            latitude: Number(dispatchPayload.latitude),
+            longitude: Number(dispatchPayload.longitude)
+        }
+        : selectedLocation;
+    const hiddenLatitudeValue = hasSelectedLocation ? String(selectedLocation.latitude) : '';
+    const hiddenLongitudeValue = hasSelectedLocation ? String(selectedLocation.longitude) : '';
+    const locationSummary = hasSelectedLocation
+        ? `${selectedLocation.latitude.toFixed(6)}, ${selectedLocation.longitude.toFixed(6)}`
+        : 'No location selected yet.';
+    const dispatchConsoleMarkup = access.recognized
         ? `
-          <section class="panel dispatch-panel">
+          <section class="panel dispatch-panel dispatch-console-panel">
             <h3>Dispatch Console</h3>
             <p class="dispatch-subtitle">Hero identified. Submit an emergency dispatch.</p>
             <form method="POST" action="/dispatch" class="stack-form">
@@ -104,28 +123,73 @@ const buildDispatchPage = ({
               <label for="severity">Severity (1-5):</label>
               <input id="severity" type="number" name="severity" min="1" max="5" value="1" required />
 
+              <div class="dispatch-map-panel">
+                <label for="dispatch-map">Emergency location:</label>
+                <p class="map-helper">Click the map to place the dispatch marker, then drag it to fine-tune the exact location.</p>
+                <div
+                  id="dispatch-map"
+                  class="dispatch-map"
+                  data-default-lat="-37.810176"
+                  data-default-lng="144.962734"
+                  data-selected-lat="${escapeHtml(hiddenLatitudeValue)}"
+                  data-selected-lng="${escapeHtml(hiddenLongitudeValue)}"
+                ></div>
+                <p class="map-readout">Selected coordinates: <strong id="dispatch-location-readout">${escapeHtml(locationSummary)}</strong></p>
+                <input id="dispatchLatitude" type="hidden" name="latitude" value="${escapeHtml(hiddenLatitudeValue)}" />
+                <input id="dispatchLongitude" type="hidden" name="longitude" value="${escapeHtml(hiddenLongitudeValue)}" />
+                <noscript>
+                  <p class="status error">JavaScript is required to choose a dispatch location on the map.</p>
+                </noscript>
+              </div>
+
               <button type="submit" ${heroCodes.length ? '' : 'disabled'}>Submit Dispatch</button>
             </form>
             ${createStatusMarkup(statusMessage, statusType)}
           </section>
-          ${dispatchPayload
-              ? `
-                <section class="panel dispatch-result">
-                  <h3>Latest Dispatch</h3>
-                  <p><strong>ID:</strong> ${escapeHtml(dispatchPayload.dispatchId || '')}</p>
-                  <p><strong>Status:</strong> ${escapeHtml(dispatchPayload.status || '')}</p>
-                  <p><strong>Hero Code:</strong> ${escapeHtml(dispatchPayload.heroCode || '')}</p>
-                  <p><strong>Severity:</strong> ${escapeHtml(String(dispatchPayload.severity ?? ''))}</p>
-                </section>
-              `
-              : ''}
         `
         : createAccessDeniedMarkup(access.username);
+    const latestDispatchMarkup = dispatchPayload
+        ? `
+          <section class="panel dispatch-result dispatch-result-panel">
+            <h3>Latest Dispatch</h3>
+            <p><strong>ID:</strong> ${escapeHtml(dispatchPayload.dispatchId || '')}</p>
+            <p><strong>Status:</strong> ${escapeHtml(dispatchPayload.status || '')}</p>
+            <p><strong>Hero Code:</strong> ${escapeHtml(dispatchPayload.heroCode || '')}</p>
+            <p><strong>Severity:</strong> ${escapeHtml(String(dispatchPayload.severity ?? ''))}</p>
+            <p><strong>Location:</strong> ${escapeHtml(
+                latestDispatchLocation
+                    ? `${Number(latestDispatchLocation.latitude).toFixed(6)}, ${Number(latestDispatchLocation.longitude).toFixed(6)}`
+                    : 'Unavailable'
+            )}</p>
+          </section>
+        `
+        : '';
 
     return buildLayout({
         pageTitle: 'Dispatch Console',
         activePage: 'dispatch',
         access,
+        headContent: access.recognized
+            ? `
+              <link
+                rel="stylesheet"
+                href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+                integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+                crossorigin=""
+              />
+            `
+            : '',
+        scripts: access.recognized
+            ? `
+              <script
+                src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+                integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+                crossorigin=""
+                defer
+              ></script>
+              <script src="assets/dispatch-map.js" defer></script>
+            `
+            : '',
         content: `
           <div class="page-grid dispatch-grid">
             ${createGreetingCard({
@@ -137,7 +201,8 @@ const buildDispatchPage = ({
                 statusMessage: !access.recognized ? statusMessage : '',
                 statusType
             })}
-            ${dispatchContent}
+            ${dispatchConsoleMarkup}
+            ${latestDispatchMarkup}
           </div>
         `
     });

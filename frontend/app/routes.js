@@ -54,6 +54,23 @@ const resolveDispatchHeroCodes = async () => {
         .sort((left, right) => left.localeCompare(right));
 };
 
+const parseCoordinate = (value) => {
+    const normalizedValue = normalizeInput(value);
+
+    if (!normalizedValue) {
+        return null;
+    }
+
+    const coordinate = Number.parseFloat(normalizedValue);
+    return Number.isFinite(coordinate) ? coordinate : null;
+};
+
+const buildSelectedLocation = (latitude, longitude) => (
+    latitude !== null && longitude !== null
+        ? { latitude, longitude }
+        : null
+);
+
 const normalizeStatusType = (value) => (value === 'error' ? 'error' : 'success');
 
 const formatBackendError = (error, fallbackMessage) => (
@@ -153,6 +170,9 @@ const registerRoutes = (app) => {
         const access = await getAccess(req.body.username);
         const heroCode = normalizeInput(req.body.heroCode);
         const severity = Number.parseInt(req.body.severity, 10);
+        const latitude = parseCoordinate(req.body.latitude);
+        const longitude = parseCoordinate(req.body.longitude);
+        const selectedLocation = buildSelectedLocation(latitude, longitude);
 
         if (!access.recognized) {
             return res.send(buildDispatchPage({
@@ -192,12 +212,18 @@ const registerRoutes = (app) => {
                 },
                 heroCodes,
                 selectedHeroCode: '',
+                selectedLocation,
                 statusMessage: 'No hero codes are currently available for dispatch.',
                 statusType: 'error'
             }));
         }
 
-        if (!heroCode || !heroCodes.includes(heroCode) || Number.isNaN(severity) || severity < 1 || severity > 5) {
+        const hasValidLocation = latitude !== null
+            && longitude !== null
+            && latitude >= -90 && latitude <= 90
+            && longitude >= -180 && longitude <= 180;
+
+        if (!heroCode || !heroCodes.includes(heroCode) || Number.isNaN(severity) || severity < 1 || severity > 5 || !hasValidLocation) {
             return res.send(buildDispatchPage({
                 access: {
                     ...access,
@@ -205,7 +231,8 @@ const registerRoutes = (app) => {
                 },
                 heroCodes,
                 selectedHeroCode,
-                statusMessage: 'Please provide a valid hero code and severity between 1 and 5.',
+                selectedLocation,
+                statusMessage: 'Please provide a valid hero code, map location, and severity between 1 and 5.',
                 statusType: 'error'
             }));
         }
@@ -213,7 +240,9 @@ const registerRoutes = (app) => {
         try {
             const dispatchPayload = await createDispatch({
                 heroCode,
-                severity
+                severity,
+                latitude,
+                longitude
             });
 
             return res.send(buildDispatchPage({
@@ -223,6 +252,7 @@ const registerRoutes = (app) => {
                 },
                 heroCodes,
                 selectedHeroCode: heroCode,
+                selectedLocation,
                 statusMessage: 'Dispatch created successfully.',
                 statusType: 'success',
                 dispatchPayload
@@ -237,6 +267,7 @@ const registerRoutes = (app) => {
                 },
                 heroCodes,
                 selectedHeroCode: heroCode,
+                selectedLocation,
                 statusMessage: formatBackendError(error, 'Dispatch request failed.'),
                 statusType: 'error'
             }));

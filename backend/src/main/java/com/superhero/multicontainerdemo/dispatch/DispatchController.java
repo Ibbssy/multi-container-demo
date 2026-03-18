@@ -30,7 +30,9 @@ public class DispatchController {
         logger.atInfo()
                 .addKeyValue("heroCode", request.heroCode())
                 .addKeyValue("severity", request.severity())
-                .log("Create dispatch request received");
+                .addKeyValue("latitude", request.latitude())
+                .addKeyValue("longitude", request.longitude())
+                .log("Create dispatch request received for location [{}, {}]", request.latitude(), request.longitude());
         return dispatchService.createDispatch(request);
     }
 }

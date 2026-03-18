@@ -74,12 +74,13 @@ const createAccessDeniedMarkup = (username) => `
     </section>
 `;
 
-const buildLayout = ({ pageTitle, activePage, access, content }) => `
+const buildLayout = ({ pageTitle, activePage, access, content, headContent = '', scripts = '' }) => `
     <html>
     <head>
       <title>${escapeHtml(pageTitle)}</title>
       <link rel="stylesheet" type="text/css" href="style.css">
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      ${headContent}
     </head>
     <body>
       ${createNavMarkup({
@@ -90,6 +91,7 @@ const buildLayout = ({ pageTitle, activePage, access, content }) => `
       <main class="page-shell ${escapeHtml(activePage || 'login')}">
         ${content}
       </main>
+      ${scripts}
     </body>
     </html>
 `;
