@@ -53,6 +53,16 @@ class HeroPersistenceIntegrationTests {
     }
 
     @Test
+    void shouldRejectDuplicateHeroCreation() throws Exception {
+        CreateHeroRequest request = new CreateHeroRequest("tony", "IronMan", "SHELLHEAD");
+
+        mockMvc.perform(post("/heroes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isConflict());
+    }
+
+    @Test
     void shouldUpdateSearchAndDeleteHero() throws Exception {
         CreateHeroRequest createRequest = new CreateHeroRequest("arthur", "Aquaman", "TIDE");
         CreateHeroRequest updateRequest = new CreateHeroRequest("arthur.curry", "Aquaman Prime", "OCEAN");
@@ -81,5 +91,15 @@ class HeroPersistenceIntegrationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.superHeroName").value("User"))
                 .andExpect(jsonPath("$.heroCode").value(""));
+    }
+
+    @Test
+    void shouldReturnNotFoundWhenUpdatingMissingHero() throws Exception {
+        CreateHeroRequest updateRequest = new CreateHeroRequest("missing.hero", "Missing Hero", "VOID");
+
+        mockMvc.perform(put("/heroes/unknown")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isNotFound());
     }
 }

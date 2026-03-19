@@ -4,66 +4,11 @@ const { normalizeInput } = require('./utils/html');
 const { buildPathWithQuery } = require('./utils/url');
 const { buildDatabasePage, buildDispatchPage, buildLoginPage } = require('./views/pages');
 
-const resolveDatabaseState = async (access, search, editUsername) => {
-    if (!access.recognized) {
-        return {
-            heroes: [],
-            editingHero: null
-        };
-    }
+const normalizeStatusType = (value) => (value === 'error' ? 'error' : 'success');
 
-    const heroes = await fetchHeroes(search);
-    let editingHero = null;
-
-    if (editUsername) {
-        editingHero = heroes.find((hero) => hero.username === editUsername) || null;
-
-        if (!editingHero) {
-            const allHeroes = await fetchHeroes('');
-            editingHero = allHeroes.find((hero) => hero.username === editUsername) || null;
-        }
-    }
-
-    return { heroes, editingHero };
-};
-
-// Database mutations should still render a usable page even if the roster reload fails afterwards.
-const safeResolveDatabaseState = async (access, search, editUsername) => {
-    try {
-        return await resolveDatabaseState(access, search, editUsername);
-    } catch (error) {
-        console.error('Error loading hero database state:', error.message);
-        return {
-            heroes: [],
-            editingHero: null
-        };
-    }
-};
-
-const buildHeroRequest = (body) => ({
-    username: normalizeInput(body.heroUsername),
-    superHeroName: normalizeInput(body.superHeroName),
-    heroCode: normalizeInput(body.heroCode)
-});
-
-const resolveDispatchHeroCodes = async () => {
-    const heroes = await fetchHeroes('');
-    return [...new Set(heroes
-        .map((hero) => normalizeInput(hero.heroCode))
-        .filter(Boolean))]
-        .sort((left, right) => left.localeCompare(right));
-};
-
-const parseCoordinate = (value) => {
-    const normalizedValue = normalizeInput(value);
-
-    if (!normalizedValue) {
-        return null;
-    }
-
-    const coordinate = Number.parseFloat(normalizedValue);
-    return Number.isFinite(coordinate) ? coordinate : null;
-};
+const formatBackendError = (error, fallbackMessage) => (
+    error.response?.data?.message || fallbackMessage
+);
 
 const buildSelectedLocation = (latitude, longitude) => (
     latitude !== null && longitude !== null
@@ -71,43 +16,150 @@ const buildSelectedLocation = (latitude, longitude) => (
         : null
 );
 
-const normalizeStatusType = (value) => (value === 'error' ? 'error' : 'success');
-
-const formatBackendError = (error, fallbackMessage) => (
-    error.response?.data?.message || fallbackMessage
-);
-
-const buildDatabaseRedirect = ({ username, search, edit, statusMessage, statusType, anchor }) => {
-    const path = buildPathWithQuery('/database', {
-        username,
-        search,
-        edit,
-        statusMessage,
-        statusType: normalizeStatusType(statusType)
+const createRouteHelpers = ({ fetchHeroes: fetchHeroesRequest, normalizeInput: normalizeInputValue, buildPathWithQuery: buildPath }) => {
+    const buildHeroRequest = (body) => ({
+        username: normalizeInputValue(body.heroUsername),
+        superHeroName: normalizeInputValue(body.superHeroName),
+        heroCode: normalizeInputValue(body.heroCode)
     });
 
-    return anchor ? `${path}#${anchor}` : path;
+    const parseCoordinate = (value) => {
+        const normalizedValue = normalizeInputValue(value);
+
+        if (!normalizedValue) {
+            return null;
+        }
+
+        const coordinate = Number.parseFloat(normalizedValue);
+        return Number.isFinite(coordinate) ? coordinate : null;
+    };
+
+    const resolveDispatchHeroCodes = async () => {
+        const heroes = await fetchHeroesRequest('');
+        return [...new Set(heroes
+            .map((hero) => normalizeInputValue(hero.heroCode))
+            .filter(Boolean))]
+            .sort((left, right) => left.localeCompare(right));
+    };
+
+    const resolveDatabaseState = async (access, search, editUsername) => {
+        if (!access.recognized) {
+            return {
+                heroes: [],
+                editingHero: null
+            };
+        }
+
+        const heroes = await fetchHeroesRequest(search);
+        let editingHero = null;
+
+        if (editUsername) {
+            editingHero = heroes.find((hero) => hero.username === editUsername) || null;
+
+            if (!editingHero) {
+                const allHeroes = await fetchHeroesRequest('');
+                editingHero = allHeroes.find((hero) => hero.username === editUsername) || null;
+            }
+        }
+
+        return { heroes, editingHero };
+    };
+
+    const safeResolveDatabaseState = async (access, search, editUsername) => {
+        try {
+            return await resolveDatabaseState(access, search, editUsername);
+        } catch (error) {
+            console.error('Error loading hero database state:', error.message);
+            return {
+                heroes: [],
+                editingHero: null
+            };
+        }
+    };
+
+    const buildDatabaseRedirect = ({ username, search, edit, statusMessage, statusType, anchor }) => {
+        const path = buildPath('/database', {
+            username,
+            search,
+            edit,
+            statusMessage,
+            statusType: normalizeStatusType(statusType)
+        });
+
+        return anchor ? `${path}#${anchor}` : path;
+    };
+
+    const buildHomeRedirect = ({ username, statusMessage, statusType }) => (
+        buildPath('/', {
+            username,
+            statusMessage,
+            statusType: normalizeStatusType(statusType)
+        })
+    );
+
+    return {
+        buildDatabaseRedirect,
+        buildHeroRequest,
+        buildHomeRedirect,
+        parseCoordinate,
+        resolveDispatchHeroCodes,
+        resolveDatabaseState,
+        safeResolveDatabaseState
+    };
 };
 
-const buildHomeRedirect = ({ username, statusMessage, statusType }) => (
-    buildPathWithQuery('/', {
-        username,
-        statusMessage,
-        statusType: normalizeStatusType(statusType)
-    })
-);
+const registerRoutes = (app, dependencies = {}) => {
+    const routeDependencies = {
+        createDispatch,
+        createHero,
+        deleteHero,
+        fetchHeroes,
+        updateHero,
+        getAccess,
+        normalizeInput,
+        buildPathWithQuery,
+        buildDatabasePage,
+        buildDispatchPage,
+        buildLoginPage,
+        ...dependencies
+    };
+    const {
+        createDispatch: createDispatchRequest,
+        createHero: createHeroRequest,
+        deleteHero: deleteHeroRequest,
+        fetchHeroes: fetchHeroesRequest,
+        updateHero: updateHeroRequest,
+        getAccess: getAccessRequest,
+        normalizeInput: normalizeInputValue,
+        buildPathWithQuery: buildPathWithQueryValue,
+        buildDatabasePage: buildDatabasePageValue,
+        buildDispatchPage: buildDispatchPageValue,
+        buildLoginPage: buildLoginPageValue
+    } = routeDependencies;
+    const {
+        buildDatabaseRedirect,
+        buildHeroRequest,
+        buildHomeRedirect,
+        parseCoordinate,
+        resolveDispatchHeroCodes,
+        resolveDatabaseState,
+        safeResolveDatabaseState
+    } = createRouteHelpers({
+        fetchHeroes: fetchHeroesRequest,
+        normalizeInput: normalizeInputValue,
+        buildPathWithQuery: buildPathWithQueryValue
+    });
 
-const registerRoutes = (app) => {
     app.get('/', async (req, res) => {
-        const access = await getAccess(req.query.username);
-        const requestStatusMessage = normalizeInput(req.query.statusMessage);
+        const access = await getAccessRequest(req.query.username);
+        const requestStatusMessage = normalizeInputValue(req.query.statusMessage);
         const statusMessage = requestStatusMessage || (access.username
             ? access.recognized
                 ? 'Hero recognized. Dispatch and database access unlocked.'
                 : 'Unrecognised username. Access remains locked.'
             : '');
 
-        res.send(buildLoginPage({
+        res.send(buildLoginPageValue({
             access,
             statusMessage,
             statusType: requestStatusMessage
@@ -117,12 +169,12 @@ const registerRoutes = (app) => {
     });
 
     app.post('/login', async (req, res) => {
-        const username = normalizeInput(req.body.username);
-        res.redirect(buildPathWithQuery('/', { username }));
+        const username = normalizeInputValue(req.body.username);
+        res.redirect(buildPathWithQueryValue('/', { username }));
     });
 
     app.get('/dispatch', async (req, res) => {
-        const access = await getAccess(req.query.username);
+        const access = await getAccessRequest(req.query.username);
         const statusMessage = access.recognized
             ? ''
             : access.username
@@ -130,7 +182,7 @@ const registerRoutes = (app) => {
                 : 'Enter a valid hero username on the login page to unlock dispatch.';
 
         if (!access.recognized) {
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access,
                 statusMessage,
                 statusType: 'error'
@@ -143,7 +195,7 @@ const registerRoutes = (app) => {
                 ? access.heroCode
                 : heroCodes[0] || '';
 
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access: {
                     ...access,
                     heroCode: selectedHeroCode
@@ -156,7 +208,7 @@ const registerRoutes = (app) => {
         } catch (error) {
             console.error('Error loading dispatch options:', error.message);
 
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access,
                 heroCodes: [],
                 selectedHeroCode: '',
@@ -167,15 +219,15 @@ const registerRoutes = (app) => {
     });
 
     app.post('/dispatch', async (req, res) => {
-        const access = await getAccess(req.body.username);
-        const heroCode = normalizeInput(req.body.heroCode);
+        const access = await getAccessRequest(req.body.username);
+        const heroCode = normalizeInputValue(req.body.heroCode);
         const severity = Number.parseInt(req.body.severity, 10);
         const latitude = parseCoordinate(req.body.latitude);
         const longitude = parseCoordinate(req.body.longitude);
         const selectedLocation = buildSelectedLocation(latitude, longitude);
 
         if (!access.recognized) {
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access,
                 statusMessage: 'Dispatch denied. Please enter a recognized username first.',
                 statusType: 'error'
@@ -189,7 +241,7 @@ const registerRoutes = (app) => {
         } catch (error) {
             console.error('Error loading dispatch options:', error.message);
 
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access,
                 heroCodes: [],
                 selectedHeroCode: '',
@@ -205,7 +257,7 @@ const registerRoutes = (app) => {
                 : heroCodes[0] || '';
 
         if (!heroCodes.length) {
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access: {
                     ...access,
                     heroCode: ''
@@ -224,7 +276,7 @@ const registerRoutes = (app) => {
             && longitude >= -180 && longitude <= 180;
 
         if (!heroCode || !heroCodes.includes(heroCode) || Number.isNaN(severity) || severity < 1 || severity > 5 || !hasValidLocation) {
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access: {
                     ...access,
                     heroCode: selectedHeroCode
@@ -238,14 +290,14 @@ const registerRoutes = (app) => {
         }
 
         try {
-            const dispatchPayload = await createDispatch({
+            const dispatchPayload = await createDispatchRequest({
                 heroCode,
                 severity,
                 latitude,
                 longitude
             });
 
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access: {
                     ...access,
                     heroCode
@@ -260,7 +312,7 @@ const registerRoutes = (app) => {
         } catch (error) {
             console.error('Error creating dispatch:', error.message);
 
-            return res.send(buildDispatchPage({
+            return res.send(buildDispatchPageValue({
                 access: {
                     ...access,
                     heroCode
@@ -275,10 +327,10 @@ const registerRoutes = (app) => {
     });
 
     app.get('/database', async (req, res) => {
-        const access = await getAccess(req.query.username);
-        const search = normalizeInput(req.query.search);
-        const editUsername = normalizeInput(req.query.edit);
-        const requestStatusMessage = normalizeInput(req.query.statusMessage);
+        const access = await getAccessRequest(req.query.username);
+        const search = normalizeInputValue(req.query.search);
+        const editUsername = normalizeInputValue(req.query.edit);
+        const requestStatusMessage = normalizeInputValue(req.query.statusMessage);
 
         try {
             const { heroes, editingHero } = await resolveDatabaseState(access, search, editUsername);
@@ -288,7 +340,7 @@ const registerRoutes = (app) => {
                     : 'Enter a valid hero username on the login page to access the database.')
                 : '');
 
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes,
                 search,
@@ -302,7 +354,7 @@ const registerRoutes = (app) => {
         } catch (error) {
             console.error('Error loading database page:', error.message);
 
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes: [],
                 search,
@@ -315,12 +367,12 @@ const registerRoutes = (app) => {
     });
 
     app.post('/database/heroes', async (req, res) => {
-        const access = await getAccess(req.body.username);
-        const search = normalizeInput(req.body.search);
+        const access = await getAccessRequest(req.body.username);
+        const search = normalizeInputValue(req.body.search);
         const heroRequest = buildHeroRequest(req.body);
 
         if (!access.recognized) {
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes: [],
                 search,
@@ -331,7 +383,7 @@ const registerRoutes = (app) => {
         }
 
         try {
-            await createHero(heroRequest);
+            await createHeroRequest(heroRequest);
             return res.redirect(buildDatabaseRedirect({
                 username: access.username,
                 search,
@@ -342,7 +394,7 @@ const registerRoutes = (app) => {
             console.error('Error creating hero:', error.message);
             const { heroes } = await safeResolveDatabaseState(access, search, '');
 
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes,
                 search,
@@ -354,13 +406,13 @@ const registerRoutes = (app) => {
     });
 
     app.post('/database/heroes/:username/update', async (req, res) => {
-        const access = await getAccess(req.body.username);
-        const search = normalizeInput(req.body.search);
+        const access = await getAccessRequest(req.body.username);
+        const search = normalizeInputValue(req.body.search);
         const existingUsername = req.params.username;
         const heroRequest = buildHeroRequest(req.body);
 
         if (!access.recognized) {
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes: [],
                 search,
@@ -373,7 +425,7 @@ const registerRoutes = (app) => {
         }
 
         try {
-            await updateHero(existingUsername, heroRequest);
+            await updateHeroRequest(existingUsername, heroRequest);
             const nextUsername = existingUsername === access.username
                 ? heroRequest.username
                 : access.username;
@@ -388,7 +440,7 @@ const registerRoutes = (app) => {
             console.error('Error updating hero:', error.message);
             const { heroes, editingHero } = await safeResolveDatabaseState(access, search, existingUsername);
 
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes,
                 search,
@@ -402,12 +454,12 @@ const registerRoutes = (app) => {
     });
 
     app.post('/database/heroes/:username/delete', async (req, res) => {
-        const access = await getAccess(req.body.username);
-        const search = normalizeInput(req.body.search);
+        const access = await getAccessRequest(req.body.username);
+        const search = normalizeInputValue(req.body.search);
         const existingUsername = req.params.username;
 
         if (!access.recognized) {
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes: [],
                 search,
@@ -417,7 +469,7 @@ const registerRoutes = (app) => {
         }
 
         try {
-            await deleteHero(existingUsername);
+            await deleteHeroRequest(existingUsername);
             if (existingUsername === access.username) {
                 return res.redirect(buildHomeRedirect({
                     statusMessage: 'Your hero profile was deleted. Please log in again.',
@@ -435,7 +487,7 @@ const registerRoutes = (app) => {
             console.error('Error deleting hero:', error.message);
             const { heroes } = await safeResolveDatabaseState(access, search, '');
 
-            return res.send(buildDatabasePage({
+            return res.send(buildDatabasePageValue({
                 access,
                 heroes,
                 search,

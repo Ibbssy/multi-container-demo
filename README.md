@@ -107,6 +107,16 @@ This project now includes a full observability pipeline for the Spring Boot back
 docker compose up --build
 ```
 
+## ✅ Run the test suite
+
+From the repo root:
+
+```bash
+./gradle-test.sh
+```
+
+This script starts a disposable PostgreSQL container, installs frontend dependencies, runs the frontend test suite, and then runs the backend Gradle tests against PostgreSQL.
+
 To generate telemetry, hit the dispatch endpoint a few times:
 
 ```bash
